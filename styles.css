@@ -1,0 +1,71 @@
+/* --- DESIGN MODERNO (DARK MODE) - VERSÃO FINAL --- */
+
+/* --- ANIMAÇÕES --- */
+@keyframes breathing {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 15px #00f0f0, 0 0 25px #00f0f0; }
+    50% { transform: scale(1.07); box-shadow: 0 0 25px #00f0f0, 0 0 35px #00f0f0; }
+}
+@keyframes sad-sigh {
+    0%, 100% { transform: scale(1.1) translateY(0); box-shadow: 0 0 15px #4169E1, 0 0 20px #4169E1;}
+    50% { transform: scale(1.05) translateY(3px); box-shadow: 0 0 10px #4169E1, 0 0 15px #4169E1;}
+}
+@keyframes angry-pulse {
+    0%, 100% { box-shadow: 0 0 15px #f00, 0 0 25px #f00; }
+    50% { box-shadow: 0 0 25px #f00, 0 0 40px #f00, 0 0 50px #f00; }
+}
+@keyframes fall-and-fade {
+    0% { transform: translateY(25px); opacity: 1; }
+    100% { transform: translateY(50px); opacity: 0; }
+}
+@keyframes blink-normal {
+    0%, 95%, 100% { transform-origin: center; transform: scaleY(1); }
+    97.5% { transform-origin: center; transform: scaleY(0.1); }
+}
+@keyframes blink-sad {
+    0%, 90%, 100% { transform-origin: center; transform: scaleY(1); }
+    95% { transform-origin: center; transform: scaleY(0.1); }
+}
+@keyframes blink-tired {
+    0%, 85%, 100% { transform-origin: center; transform: scaleY(0.4); }
+    90% { transform-origin: center; transform: scaleY(0.5); }
+    95% { transform-origin: center; transform: scaleY(0.1); }
+}
+@keyframes blink-angry {
+    0%, 98%, 100% { transform-origin: center; transform: scaleY(1); }
+    99% { transform-origin: center; transform: scaleY(0.1); }
+}
+
+/* --- ESTILOS GERAIS --- */
+body { font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #1a1a1a; color: white; overflow: hidden; }
+.animatronico, .face { display: flex; flex-direction: column; align-items: center; }
+.face { margin-bottom: 40px; }
+.eyes { display: flex; gap: 30px; }
+.eye { width: 50px; height: 50px; background-color: #00f0f0; border-radius: 50%; transition: all 0.4s ease-in-out; box-shadow: 0 0 15px #00f0f0, 0 0 25px #00f0f0; animation: breathing 4s ease-in-out infinite, blink-normal 7s linear infinite; display: flex; justify-content: center; align-items: center; position: relative; border-bottom: 0px solid transparent; }
+.pupil { width: 40%; height: 40%; background-color: #000; border-radius: 50%; transition: all 0.4s ease-in-out, opacity 0.4s ease-in-out; position: relative; opacity: 1; }
+.pupil::after { content: ''; position: absolute; top: 15%; right: 15%; width: 30%; height: 30%; background-color: white; border-radius: 50%; transition: all 0.3s ease-in-out; }
+.tear { position: absolute; width: 12px; height: 18px; background-color: white; clip-path: path('M6 0 C0 0 0 10 6 18 C12 10 12 0 6 0 Z'); left: 50%; top: 50%; margin-left: -6px; opacity: 0; box-shadow: 0 0 8px white; transform: translateY(25px); }
+.brows { display: flex; gap: 25px; margin-bottom: 15px; }
+.brow { width: 60px; height: 12px; background-color: #00f0f0; border-radius: 8px; transition: all 0.4s ease-in-out, opacity 0.4s ease-in-out; box-shadow: 0 0 10px #00f0f0; opacity: 1; }
+.controls-container { text-align: center; }
+.controls { display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+button { padding: 12px 20px; background-color: transparent; border: 2px solid #00f0f0; color: #00f0f0; border-radius: 30px; cursor: pointer; font-size: 16px; font-weight: bold; margin: 5px; transition: all 0.3s ease; }
+button:hover { background-color: #00f0f0; color: #1a1a1a; box-shadow: 0 0 15px #00f0f0; }
+button.selecionado { background-color: #8A2BE2; border-color: #8A2BE2; color: white; box-shadow: 0 0 15px #8A2BE2; }
+
+/* --- EXPRESSÕES --- */
+.face.triste .eye { transform: scale(1.1); background-color: #4169E1; box-shadow: 0 0 15px #4169E1, 0 0 20px #4169E1; animation: sad-sigh 5s ease-in-out infinite, blink-sad 8s linear infinite; }
+.face.triste .brow.left { transform: rotate(-15deg); }
+.face.triste .brow.right { transform: rotate(15deg); }
+.face.triste .pupil { width: 60%; height: 60%; background-color: #000; }
+.face.triste .tear { animation: fall-and-fade 2.5s ease-in forwards; animation-delay: 0.3s; }
+.face.cansado .eye { transform: scaleY(0.4); background-color: #6B8E23; box-shadow: inset 0 -10px 15px -5px rgba(0, 0, 0, 0.5), 0 0 15px #6B8E23, 0 0 20px #6B8E23; animation: blink-tired 9s linear infinite; }
+.face.cansado .brow { transform: translateY(4px); }
+.face.cansado .pupil { width: 50%; height: 25%; }
+.face.feliz .eye { width: 50px; height: 25px; background-color: transparent; border-top: 8px solid #FFD700; border-radius: 30px 30px 0 0; animation: none; filter: drop-shadow(0 2px 8px #FFD700); box-shadow: none; transform: none; }
+.face.feliz .brow { opacity: 0; }
+.face.feliz .pupil { opacity: 0; }
+.face.bravo .eye { transform: scale(1.2); background-color: #f00; box-shadow: 0 0 15px #f00, 0 0 25px #f00; animation: angry-pulse 1s ease-in-out infinite, blink-angry 10s linear infinite; }
+.face.bravo .brow.left { transform: rotate(25deg); }
+.face.bravo .brow.right { transform: rotate(-25deg); }
+.face.bravo .pupil { width: 20%; height: 20%; background-color: #000; }
+.face.triste .pupil::after, .face.cansado .pupil::after, .face.bravo .pupil::after { display: none; }
