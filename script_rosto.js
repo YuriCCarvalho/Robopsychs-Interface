@@ -8,7 +8,6 @@ const MQTT_CLIENT_ID = "RostoClient_" + Math.random().toString(16).substr(2, 8);
 const client = new Paho.MQTT.Client(MQTT_BROKER, MQTT_PORT, MQTT_CLIENT_ID);
 client.onConnectionLost = onConnectionLost;
 client.onMessageArrived = onMessageArrived;
-// Ligar usando SSL (para wss://)
 client.connect({ onSuccess: onConnect, useSSL: true });
 
 function onConnect() {
@@ -22,6 +21,7 @@ function onConnectionLost(responseObject) {
     }
 }
 
+// --- FUNÇÃO CHAMADA QUANDO UMA MENSAGEM CHEGA ---
 function onMessageArrived(message) {
     const expressionId = parseInt(message.payloadString);
     console.log(`Comando recebido: ${expressionId}`);
@@ -34,7 +34,7 @@ function onMessageArrived(message) {
 }
 
 const expressionMap = {
-    'neutro': 0, 'triste': 1, 'cansado': 2, 'feliz': 3, 'bravo': 4
+    'neutro': 0, 'triste': 1, 'cansado': 2, 'feliz': 3, 'bravo': 4, 'dormindo': 5
 };
 const expressions = Object.keys(expressionMap);
 
@@ -43,11 +43,10 @@ function changeExpression(expression) {
     
     face.classList.remove(...expressions);
 
-    if (expression !== 'neutro') {
-        face.classList.add(expression);
-    }
+    face.classList.add(expression);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    changeExpression('neutro');
+    // O rosto agora começa no estado "dormindo" por defeito
+    changeExpression('dormindo');
 });
