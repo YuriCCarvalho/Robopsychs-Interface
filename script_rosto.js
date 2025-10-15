@@ -1,6 +1,6 @@
-// --- CONFIGURAÇÃO DO MQTT ---
+// --- CONFIGURAÇÃO DO MQTT (VERSÃO SEGURA) ---
 const MQTT_BROKER = "test.mosquitto.org";
-const MQTT_PORT = 8081;
+const MQTT_PORT = 8081; // Porta para ligação segura (wss)
 const MQTT_TOPIC = "robopsychs/expressao";
 const MQTT_CLIENT_ID = "RostoClient_" + Math.random().toString(16).substr(2, 8);
 
@@ -21,23 +21,7 @@ function onConnectionLost(responseObject) {
     }
 }
 
-// --- LÓGICA DO TEMPORIZADOR DE INATIVIDADE ---
-let idleTimer;
-// Tempo em milissegundos (2 * 60 * 1000 = 2 minutos)
-// Altere este valor para 3 * 60 * 1000 para 3 minutos
-const IDLE_TIMEOUT = 2 * 60 * 1000; 
-
-// Função que reinicia o temporizador
-function resetIdleTimer() {
-    // Limpa qualquer temporizador anterior
-    clearTimeout(idleTimer);
-    // Cria um novo temporizador que, ao terminar, muda a expressão para "dormindo"
-    idleTimer = setTimeout(() => {
-        changeExpression('dormindo');
-    }, IDLE_TIMEOUT);
-}
-
-// --- FUNÇÃO CHAMADA QUANDO UMA MENSAGEM CHEGA ---
+// --- FUNÇÃO CHAMADA QUANDO UMA MENSAGEM CHEGA (A ÚNICA LÓGICA DO ROSTO) ---
 function onMessageArrived(message) {
     const expressionId = parseInt(message.payloadString);
     console.log(`Comando recebido: ${expressionId}`);
@@ -46,12 +30,9 @@ function onMessageArrived(message) {
 
     if (expressionName) {
         changeExpression(expressionName);
-        // A CADA COMANDO RECEBIDO, REINICIA O TEMPORIZADOR
-        resetIdleTimer();
     }
 }
 
-// Adicionada a nova expressão "dormindo"
 const expressionMap = {
     'neutro': 0, 'triste': 1, 'cansado': 2, 'feliz': 3, 'bravo': 4, 'dormindo': 5
 };
@@ -61,15 +42,7 @@ function changeExpression(expression) {
     const face = document.querySelector('.face');
     
     face.classList.remove(...expressions);
-
-    if (expression !== 'neutro') {
-        face.classList.add(expression);
-    }
+    face.classList.add(expression);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Inicia na expressão neutra
-    changeExpression('neutro');
-    // Inicia o primeiro temporizador de inatividade
-    resetIdleTimer();
-});
+// O rosto começa sem expressão definida e espera o primeiro comando do controlador
