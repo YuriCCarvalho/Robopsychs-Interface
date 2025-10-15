@@ -11,7 +11,7 @@ client.connect({ onSuccess: onConnect, useSSL: true });
 
 function onConnect() {
   console.log("Controlador ligado ao Broker MQTT (Seguro)!");
-  // Quando liga, envia o comando inicial para o rosto 'acordar' para o estado dormindo
+  // Assim que o controlador se liga, manda o rosto (e o robô) para o estado inicial 'dormindo'
   sendCommandToRobot('dormindo');
 }
 
@@ -21,7 +21,7 @@ function onConnectionLost(responseObject) {
   }
 }
 
-// --- LÓGICA DO TEMPORIZADOR DE INATIVIDADE ---
+// --- LÓGICA DO TEMPORIZADOR DE INATIVIDADE (AGORA SÓ EXISTE AQUI) ---
 let idleTimer;
 // Tempo em milissegundos (2 minutos). Altere o 2 para 3 para 3 minutos.
 const IDLE_TIMEOUT = 2 * 60 * 1000; 
@@ -82,4 +82,4 @@ function sendCommandToRobot(expression) {
     console.log(`Comando '${expression}' (código: ${expressionId}) enviado.`);
 }
 
-// Nenhum botão começa selecionado
+// Nenhum botão começa selecionado e o temporizador começa quando o primeiro comando é enviado
