@@ -1,5 +1,5 @@
 // IMPORTANTE: COLOQUE AQUI O SEU LINK DO RENDER!
-const RENDER_SERVER_URL = "https://SEU-LINK-DO-RENDER.onrender.com";
+const RENDER_SERVER_URL = "https://robopsychs-server.onrender.com";
 
 const expressionMap = { 'neutro': 0, 'triste': 1, 'cansado': 2, 'feliz': 3, 'bravo': 4 };
 const buttons = document.querySelectorAll('.controls button');
@@ -27,3 +27,4 @@ async function sendCommand(expression) {
 }
 
 // Nenhum botão começa selecionado
+
