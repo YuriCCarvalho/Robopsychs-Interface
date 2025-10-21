@@ -3,7 +3,7 @@ const MQTT_BROKER = "test.mosquitto.org";
 const MQTT_PORT = 8081; // Porta para ligação segura (wss)
 const MQTT_TOPIC = "robopsychs/expressao";
 const MQTT_CLIENT_ID = "RostoClient_" + Math.random().toString(16).substr(2, 8);
-
+const RENDER_SERVER_URL = "https://robopsychs-server.onrender.com";
 // --- LIGAÇÃO AO MQTT ---
 const client = new Paho.MQTT.Client(MQTT_BROKER, MQTT_PORT, MQTT_CLIENT_ID);
 client.onConnectionLost = onConnectionLost;
@@ -46,3 +46,4 @@ function changeExpression(expression) {
 }
 
 // O rosto começa sem expressão definida e espera o primeiro comando do controlador
+
