@@ -28,3 +28,4 @@ async function sendCommand(expression) {
 
 // Nenhum botão começa selecionado
 
+
