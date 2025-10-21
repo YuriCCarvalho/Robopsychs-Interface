@@ -1,49 +1,31 @@
-// --- CONFIGURAÇÃO DO MQTT (VERSÃO SEGURA) ---
-const MQTT_BROKER = "test.mosquitto.org";
-const MQTT_PORT = 8081; // Porta para ligação segura (wss)
-const MQTT_TOPIC = "robopsychs/expressao";
-const MQTT_CLIENT_ID = "RostoClient_" + Math.random().toString(16).substr(2, 8);
-const RENDER_SERVER_URL = "https://robopsychs-server.onrender.com";
-// --- LIGAÇÃO AO MQTT ---
-const client = new Paho.MQTT.Client(MQTT_BROKER, MQTT_PORT, MQTT_CLIENT_ID);
-client.onConnectionLost = onConnectionLost;
-client.onMessageArrived = onMessageArrived;
-client.connect({ onSuccess: onConnect, useSSL: true });
+// IMPORTANTE: COLOQUE AQUI O SEU LINK DO RENDER!
+const RENDER_SERVER_URL = "https://SEU-LINK-DO-RENDER.onrender.com";
 
-function onConnect() {
-    console.log("Rosto ligado ao Broker MQTT (Seguro)!");
-    client.subscribe(MQTT_TOPIC);
-}
-
-function onConnectionLost(responseObject) {
-    if (responseObject.errorCode !== 0) {
-        console.log("Ligação perdida: " + responseObject.errorMessage);
-    }
-}
-
-// --- FUNÇÃO CHAMADA QUANDO UMA MENSAGEM CHEGA (A ÚNICA LÓGICA DO ROSTO) ---
-function onMessageArrived(message) {
-    const expressionId = parseInt(message.payloadString);
-    console.log(`Comando recebido: ${expressionId}`);
-    
-    const expressionName = Object.keys(expressionMap).find(key => expressionMap[key] === expressionId);
-
-    if (expressionName) {
-        changeExpression(expressionName);
-    }
-}
-
-const expressionMap = {
-    'neutro': 0, 'triste': 1, 'cansado': 2, 'feliz': 3, 'bravo': 4, 'dormindo': 5
-};
-const expressions = Object.keys(expressionMap);
+const expressions = ['neutro', 'triste', 'cansado', 'feliz', 'bravo', 'dormindo'];
 
 function changeExpression(expression) {
     const face = document.querySelector('.face');
-    
-    face.classList.remove(...expressions);
-    face.classList.add(expression);
+    face.className = 'face'; // Limpa todas as classes de expressão
+    if (expression) {
+        face.classList.add(expression);
+    }
 }
 
-// O rosto começa sem expressão definida e espera o primeiro comando do controlador
+// Ligar ao nosso retransmissor no Render
+const socket = io(RENDER_SERVER_URL);
+
+socket.on('connect', () => {
+    console.log('Conectado ao servidor do Rosto!');
+});
+
+// Ouve por comandos de mudança de expressão
+socket.on('expression-change', (expression) => {
+    console.log(`Comando recebido: ${expression}`);
+    changeExpression(expression);
+});
+
+// Começa no estado dormindo
+document.addEventListener('DOMContentLoaded', () => {
+    changeExpression('dormindo');
+});
 
