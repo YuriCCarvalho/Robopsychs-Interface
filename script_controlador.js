@@ -1,86 +1,29 @@
-// --- CONFIGURAÇÃO DO MQTT (VERSÃO SEGURA) ---
-const MQTT_BROKER = "test.mosquitto.org";
-const MQTT_PORT = 8081; // Porta para ligação segura (wss)
-const MQTT_TOPIC = "robopsychs/expressao";
-const MQTT_CLIENT_ID = "ControladorClient_" + Math.random().toString(16).substr(2, 8);
-const RENDER_SERVER_URL = "https://robopsychs-server.onrender.com";
-// --- LIGAÇÃO AO MQTT ---
-const client = new Paho.MQTT.Client(MQTT_BROKER, MQTT_PORT, MQTT_CLIENT_ID);
-client.onConnectionLost = onConnectionLost;
-client.connect({ onSuccess: onConnect, useSSL: true });
+// IMPORTANTE: COLOQUE AQUI O SEU LINK DO RENDER!
+const RENDER_SERVER_URL = "https://SEU-LINK-DO-RENDER.onrender.com";
 
-function onConnect() {
-  console.log("Controlador ligado ao Broker MQTT (Seguro)!");
-  // Assim que o controlador se liga, manda o rosto (e o robô) para o estado inicial 'dormindo'
-  sendCommandToRobot('dormindo');
-}
-
-function onConnectionLost(responseObject) {
-  if (responseObject.errorCode !== 0) {
-    console.log("Ligação perdida: " + responseObject.errorMessage);
-  }
-}
-
-// --- LÓGICA DO TEMPORIZADOR DE INATIVIDADE (AGORA SÓ EXISTE AQUI) ---
-let idleTimer;
-// Tempo em milissegundos (2 minutos). Altere o 2 para 3 para 3 minutos.
-const IDLE_TIMEOUT = 2 * 60 * 1000; 
-
-function resetIdleTimer() {
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(goToSleep, IDLE_TIMEOUT);
-}
-
-function goToSleep() {
-    console.log("Tempo de inatividade atingido. A enviar comando 'dormindo'.");
-    // Envia o comando para o rosto e para o robô irem dormir
-    sendCommandToRobot('dormindo');
-    // Desseleciona todos os botões no controlador
-    buttons.forEach(button => {
-        button.classList.remove('selecionado');
-    });
-}
-
-const expressionMap = {
-    'neutro': 0, 'triste': 1, 'cansado': 2, 'feliz': 3, 'bravo': 4, 'dormindo': 5
-};
+const expressionMap = { 'neutro': 0, 'triste': 1, 'cansado': 2, 'feliz': 3, 'bravo': 4 };
 const buttons = document.querySelectorAll('.controls button');
 
-// Função principal que é chamada pelos botões
-function sendCommand(expression) {
-    // A cada comando, reinicia o temporizador de inatividade
-    resetIdleTimer();
-    
-    // Atualiza a cor do botão selecionado
+async function sendCommand(expression) {
     buttons.forEach(button => {
-        if (button.textContent.toLowerCase() === expression) {
-            button.classList.add('selecionado');
-        } else {
-            button.classList.remove('selecionado');
-        }
+        button.classList.toggle('selecionado', button.textContent.toLowerCase() === expression);
     });
 
-    // Envia o comando para o rosto e para o robô
-    sendCommandToRobot(expression);
-}
-
-// Função que realmente envia a mensagem MQTT
-function sendCommandToRobot(expression) {
-    if (!client.isConnected()) {
-        console.error("Não foi possível enviar o comando. Cliente MQTT não está ligado.");
-        // Não mostra o alerta no modo de dormir automático para não ser chato
-        if (expression !== 'dormindo') {
-            alert("Erro: Não foi possível ligar ao servidor. Por favor, verifique a sua ligação à internet ou firewall e recarregue a página.");
+    try {
+        const response = await fetch(`${RENDER_SERVER_URL}/command`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ expression: expression })
+        });
+        if (response.ok) {
+            console.log(`Comando '${expression}' enviado com sucesso.`);
+        } else {
+            throw new Error('Falha ao enviar o comando.');
         }
-        return;
+    } catch (error) {
+        console.error("Erro:", error);
+        alert("Erro ao enviar o comando. O servidor pode estar offline.");
     }
-
-    const expressionId = expressionMap[expression];
-    const message = new Paho.MQTT.Message(String(expressionId));
-    message.destinationName = MQTT_TOPIC;
-    client.send(message);
-    console.log(`Comando '${expression}' (código: ${expressionId}) enviado.`);
 }
 
-// Nenhum botão começa selecionado e o temporizador começa quando o primeiro comando é enviado
-
+// Nenhum botão começa selecionado
