@@ -1,5 +1,5 @@
 // IMPORTANTE: COLOQUE AQUI O SEU LINK DO RENDER!
-const RENDER_SERVER_URL = "https://SEU-LINK-DO-RENDER.onrender.com";
+const RENDER_SERVER_URL = "https://robopsychs-server.onrender.com";
 
 const expressions = ['neutro', 'triste', 'cansado', 'feliz', 'bravo', 'dormindo'];
 
@@ -28,4 +28,5 @@ socket.on('expression-change', (expression) => {
 document.addEventListener('DOMContentLoaded', () => {
     changeExpression('dormindo');
 });
+
 
