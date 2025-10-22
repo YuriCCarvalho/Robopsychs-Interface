@@ -28,6 +28,3 @@ socket.on('expression-change', (expression) => {
 document.addEventListener('DOMContentLoaded', () => {
     changeExpression('dormindo');
 });
-
-
-
