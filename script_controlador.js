@@ -25,7 +25,4 @@ async function sendCommand(expression) {
         alert("Erro ao enviar o comando. O servidor pode estar offline.");
     }
 }
-
 // Nenhum botão começa selecionado
-
-
