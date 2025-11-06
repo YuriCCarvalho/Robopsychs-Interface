@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     changeExpression('dormindo');
 });
 
-// --- ▼▼▼ NOVO CÓDIGO (GRAVAÇÃO E SIMULAÇÃO) ADICIONADO ABAIXO ▼▼▼ ---
+// --- ▼▼▼ NOVO CÓDIGO (GRAVAÇÃO E ENVIO REAL) ADICIONADO ABAIXO ▼▼▼ ---
 
 // --- Lógica de Gravação de Áudio ---
 
@@ -63,8 +63,7 @@ gravarBtn.addEventListener('click', async () => {
             audioChunks = [];
 
             // --- AQUI ENTRA O "TRATAMENTO" ---
-            // Esta é a hora de enviar o audioBlob para o Guilherme
-            // Vamos chamar a função de SIMULAÇÃO para isso
+            // Enviar o audioBlob para o link que você gerou
             enviarAudioParaTratamento(audioBlob);
 
             // Reseta os botões
@@ -94,43 +93,20 @@ pararBtn.addEventListener('click', () => {
 
 
 // --- FUNÇÃO DE "TRATAMENTO" (Envio) ---
-// VERSÃO DE SIMULAÇÃO (Não precisa da URL do Guilherme)
+// VERSÃO REAL (Envia para o seu link do Webhook.site)
 async function enviarAudioParaTratamento(audioBlob) {
     
-    // O 'audioBlob' está aqui, a gravação funcionou.
-    console.log("SIMULAÇÃO: Áudio gravado com sucesso.", audioBlob);
-
-    // --- BLOCO DE SIMULAÇÃO ---
-    // Em vez de enviar, vamos fingir uma resposta do Guilherme
-    console.log("SIMULAÇÃO: Fingindo uma resposta do servidor do Guilherme...");
-
-    // 1. Crie uma resposta falsa (como se o Guilherme a tivesse enviado)
-    const respostaFalsa = {
-        expressao: "feliz", // A expressão que ele mandou
-        audioResposta: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" // Um áudio de teste da internet
-    };
-
-    // 2. Chame a função que acabamos de criar para processar essa resposta
-    await processarRespostaDoGuilherme(respostaFalsa);
-    
-    // ------------------------------------
-    // O CÓDIGO DE ENVIO REAL FICARÁ "DORMINDO" AQUI EMBAIXO
-    // ------------------------------------
-
-    const URL_DO_GUILHERME = "URL_DO_GUILHERME_AQUI"; 
-    if (URL_DO_GUILHERME === "URL_DO_GUILHERME_AQUI") {
-        console.log("A simulação funcionou. Quando tiver a URL real, o código abaixo será usado.");
-        return; // Para a simulação, paramos aqui.
-    }
+    // Esta é a URL que você gerou, como o Guilherme pediu
+    const URL_PARA_TESTE = "https://webhook.site/834ffb53-cacb-4f7f-aa20-669d6628efb7"; 
 
     // Usa FormData para enviar o arquivo, é o método padrão
     let formData = new FormData();
     formData.append('audioFile', audioBlob, 'gravacao_usuario.webm');
 
-    console.log("Enviando áudio para tratamento...");
+    console.log("Enviando áudio para o Webhook de teste...");
 
     try {
-        const response = await fetch(URL_DO_GUILHERME, {
+        const response = await fetch(URL_PARA_TESTE, {
             method: 'POST',
             body: formData
         });
@@ -139,21 +115,23 @@ async function enviarAudioParaTratamento(audioBlob) {
             throw new Error(`Erro do servidor: ${response.statusText}`);
         }
 
-        const resposta = await response.json(); // Espera a resposta dele
-        console.log("Resposta do tratamento recebida:", resposta);
-        
-        // --- QUANDO FOR REAL, A FUNÇÃO SERÁ CHAMADA AQUI ---
-        await processarRespostaDoGuilherme(resposta);
+        console.log("SUCESSO! Áudio enviado para o webhook.");
+        alert("Teste concluído! O áudio foi enviado para o link de teste.");
+
+        // NOTA: Não vamos processar a resposta, pois o webhook.site
+        // não devolve o JSON que o Guilherme vai devolver.
+        // Já provamos que o envio (tratamento) funciona.
 
     } catch (err) {
-        console.error("Erro ao enviar áudio para tratamento:", err);
-        alert("Falha ao enviar áudio para o servidor do Guilherme.");
+        console.error("Erro ao enviar áudio para o webhook:", err);
+        alert("Falha ao enviar áudio para o link de teste.");
     }
 }
 
 
 // --- FUNÇÃO DE PROCESSAMENTO (TAREFA 2B do Guilherme) ---
-// Esta função pega a resposta do Guilherme e age sobre ela
+// Esta função vai ser usada quando tivermos o link REAL do Guilherme.
+// Por enquanto, ela fica aqui esperando.
 async function processarRespostaDoGuilherme(resposta) {
     console.log(`Processando resposta: tocando áudio e mudando expressão para '${resposta.expressao}'`);
 
@@ -172,9 +150,7 @@ async function processarRespostaDoGuilherme(resposta) {
     // 2. Mudar a expressão do rosto (enviando para o SEU servidor Render)
     if (resposta.expressao) {
         try {
-            // Este é o "celular" da sua aplicação A (o controlador)
-            // ligando para a sua aplicação B (o rosto/servos)
-            await fetch(`${RENDER_SERVER_URL}/command`, { // Usa a sua URL do Render
+            await fetch(`${RENDER_SERVER_URL}/command`, { 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ expression: resposta.expressao })
