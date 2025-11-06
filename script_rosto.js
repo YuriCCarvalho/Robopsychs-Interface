@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     changeExpression('dormindo');
 });
 
-// --- ▼▼▼ NOVO CÓDIGO ADICIONADO ABAIXO ▼▼▼ ---
+// --- ▼▼▼ NOVO CÓDIGO (GRAVAÇÃO E SIMULAÇÃO) ADICIONADO ABAIXO ▼▼▼ ---
 
 // --- Lógica de Gravação de Áudio ---
 
@@ -64,7 +64,7 @@ gravarBtn.addEventListener('click', async () => {
 
             // --- AQUI ENTRA O "TRATAMENTO" ---
             // Esta é a hora de enviar o audioBlob para o Guilherme
-            // Vamos chamar uma função para isso
+            // Vamos chamar a função de SIMULAÇÃO para isso
             enviarAudioParaTratamento(audioBlob);
 
             // Reseta os botões
@@ -94,15 +94,33 @@ pararBtn.addEventListener('click', () => {
 
 
 // --- FUNÇÃO DE "TRATAMENTO" (Envio) ---
+// VERSÃO DE SIMULAÇÃO (Não precisa da URL do Guilherme)
 async function enviarAudioParaTratamento(audioBlob) {
-    // !! IMPORTANTE !!
-    // Você PRECISA substituir 'URL_DO_GUILHERME_AQUI' pela URL que ele te passar
-    const URL_DO_GUILHERME = "URL_DO_GUILHERME_AQUI"; 
+    
+    // O 'audioBlob' está aqui, a gravação funcionou.
+    console.log("SIMULAÇÃO: Áudio gravado com sucesso.", audioBlob);
 
+    // --- BLOCO DE SIMULAÇÃO ---
+    // Em vez de enviar, vamos fingir uma resposta do Guilherme
+    console.log("SIMULAÇÃO: Fingindo uma resposta do servidor do Guilherme...");
+
+    // 1. Crie uma resposta falsa (como se o Guilherme a tivesse enviado)
+    const respostaFalsa = {
+        expressao: "feliz", // A expressão que ele mandou
+        audioResposta: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" // Um áudio de teste da internet
+    };
+
+    // 2. Chame a função que acabamos de criar para processar essa resposta
+    await processarRespostaDoGuilherme(respostaFalsa);
+    
+    // ------------------------------------
+    // O CÓDIGO DE ENVIO REAL FICARÁ "DORMINDO" AQUI EMBAIXO
+    // ------------------------------------
+
+    const URL_DO_GUILHERME = "URL_DO_GUILHERME_AQUI"; 
     if (URL_DO_GUILHERME === "URL_DO_GUILHERME_AQUI") {
-        console.error("VOCÊ PRECISA DA URL DO GUILHERME!");
-        alert("A gravação funcionou, mas não posso enviá-la sem a URL do Guilherme.");
-        return;
+        console.log("A simulação funcionou. Quando tiver a URL real, o código abaixo será usado.");
+        return; // Para a simulação, paramos aqui.
     }
 
     // Usa FormData para enviar o arquivo, é o método padrão
@@ -121,13 +139,49 @@ async function enviarAudioParaTratamento(audioBlob) {
             throw new Error(`Erro do servidor: ${response.statusText}`);
         }
 
-        const resposta = await response.json(); // Espera a resposta dele (expressão, áudio)
-
+        const resposta = await response.json(); // Espera a resposta dele
         console.log("Resposta do tratamento recebida:", resposta);
         
-        
+        // --- QUANDO FOR REAL, A FUNÇÃO SERÁ CHAMADA AQUI ---
+        await processarRespostaDoGuilherme(resposta);
+
     } catch (err) {
         console.error("Erro ao enviar áudio para tratamento:", err);
         alert("Falha ao enviar áudio para o servidor do Guilherme.");
+    }
+}
+
+
+// --- FUNÇÃO DE PROCESSAMENTO (TAREFA 2B do Guilherme) ---
+// Esta função pega a resposta do Guilherme e age sobre ela
+async function processarRespostaDoGuilherme(resposta) {
+    console.log(`Processando resposta: tocando áudio e mudando expressão para '${resposta.expressao}'`);
+
+    // 1. Reproduzir o áudio de resposta que ele mandou
+    if (resposta.audioResposta) {
+        try {
+            const audioDeResposta = new Audio(resposta.audioResposta);
+            await audioDeResposta.play();
+            console.log("Reprodução de áudio concluída.");
+        } catch (e) {
+            console.error("Erro ao tentar tocar o áudio de resposta:", e);
+            alert("Erro ao tocar o áudio. O navegador pode ter bloqueado.");
+        }
+    }
+
+    // 2. Mudar a expressão do rosto (enviando para o SEU servidor Render)
+    if (resposta.expressao) {
+        try {
+            // Este é o "celular" da sua aplicação A (o controlador)
+            // ligando para a sua aplicação B (o rosto/servos)
+            await fetch(`${RENDER_SERVER_URL}/command`, { // Usa a sua URL do Render
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ expression: resposta.expressao })
+            });
+            console.log(`Comando '${resposta.expressao}' enviado para o servidor Render.`);
+        } catch (error) {
+            console.error("Erro ao enviar comando de expressão para o Render:", error);
+        }
     }
 }
